@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>The Spykman Trap — Interactive</title>
+
+<style>
+
+:root{
+  --ink:#181716;
+  --paper:#f7f4ed;
+  --muted:#6b665f;
+  --rule:#d8d2c8;
+  --red:#ad1f24;
+  --red-dark:#741015;
+  --white:#fffdf8;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  background:var(--paper);
+  color:var(--ink);
+}
+
+body{
+  font-family:Georgia,"Times New Roman",serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  width:min(1080px,calc(100% - 30px));
+  margin:auto;
+}
+
+header{
+  padding:30px 0 18px;
+  border-bottom:1px solid var(--ink);
+}
+
+.kicker{
+  font:700 10px/1.2 Arial,sans-serif;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  color:var(--red);
+}
+
+h1{
+  font-size:clamp(34px,5.2vw,62px);
+  line-height:.95;
+  letter-spacing:-.045em;
+  margin:10px 0 9px;
+}
+
+.dek{
+  max-width:760px;
+  margin:0;
+  font-size:clamp(17px,2vw,21px);
+  line-height:1.42;
+  color:#403c37;
+}
+
+main{
+  padding:22px 0 48px;
+}
+
+.panel{
+  background:var(--white);
+  border:1px solid var(--rule);
+  padding:18px;
+  box-shadow:0 1px 0 #00000008;
+}
+
+
+/* =====================================================
+   FORMULA
+===================================================== */
+
+.formula{
+  border-left:4px solid var(--red);
+  background:#f1e6e1;
+  padding:12px 15px;
+  margin-bottom:18px;
+}
+
+.formula .label{
+  font:700 10px/1 Arial,sans-serif;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--red);
+}
+
+.formula .eq{
+  font-size:clamp(18px,2.8vw,27px);
+  line-height:1.25;
+  margin-top:7px;
+}
+
+.formula em{
+  font-style:normal;
+  color:var(--red);
+  font-weight:700;
+}
+
+
+/* =====================================================
+   GRAPH
+===================================================== */
+
+.plot{
+  width:100%;
+  overflow:hidden;
+}
+
+.plot svg{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+
+/* =====================================================
+   LEGEND
+===================================================== */
+
+.legend{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 18px;
+  margin:8px 0 4px;
+  font:12px/1.35 Arial,sans-serif;
+  color:#514d47;
+}
+
+.legend span{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.swatch{
+  width:10px;
+  height:10px;
+  display:inline-block;
+}
+
+.swatch.red{
+  background:var(--red);
+}
+
+.swatch.black{
+  background:var(--ink);
+  border-radius:50%;
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+.controls{
+  margin-top:16px;
+}
+
+.control{
+  display:grid;
+  grid-template-columns:250px 1fr;
+  gap:15px;
+  padding:13px 0;
+  border-top:1px solid var(--rule);
+  align-items:center;
+}
+
+.control:last-child{
+  border-bottom:1px solid var(--rule);
+}
+
+.control-name{
+  font-size:15px;
+  line-height:1.2;
+}
+
+.control-name small{
+  display:block;
+  font:11px/1.35 Arial,sans-serif;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.choices{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+button{
+  appearance:none;
+  border:1px solid #c9c4bb;
+  background:#faf8f3;
+  color:#24221f;
+  border-radius:3px;
+  min-height:42px;
+  padding:8px 6px;
+  cursor:pointer;
+  font:700 10px/1.15 Arial,sans-serif;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+
+button.active{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:#fff;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status{
+  margin-top:17px;
+  padding:13px 15px;
+  border-top:3px solid var(--red);
+  background:#f4e8e5;
+}
+
+.status strong{
+  display:block;
+  font:800 10px/1 Arial,sans-serif;
+  letter-spacing:.14em;
+  color:var(--red);
+}
+
+.status p{
+  font-size:16px;
+  line-height:1.43;
+  margin:7px 0 0;
+}
+
+.note{
+  margin-top:13px;
+  font:12px/1.5 Arial,sans-serif;
+  color:var(--muted);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:700px){
+
+  .wrap{
+    width:calc(100% - 20px);
+  }
+
+  header{
+    padding-top:22px;
+  }
+
+  main{
+    padding-top:13px;
+  }
+
+  .panel{
+    padding:12px;
+  }
+
+  .control{
+    grid-template-columns:1fr;
+    gap:8px;
+    padding:11px 0;
+  }
+
+  .control-name{
+    font-size:14px;
+  }
+
+  .choices{
+    gap:5px;
+  }
+
+  button{
+    min-height:43px;
+    font-size:9.5px;
+  }
+
+  .legend{
+    grid-template-columns:1fr;
+    font-size:11px;
+  }
+
+  .status p{
+    font-size:14.5px;
+  }
+
+  .formula{
+    padding:10px 12px;
+  }
+}
+
+
+@media(max-width:390px){
+
+  .choices{
+    grid-template-columns:1fr 1fr 1fr;
+  }
+
+  button{
+    font-size:8.5px;
+    min-height:42px;
+  }
+
+  .formula .eq{
+    font-size:17px;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+  <div class="wrap">
+
+    <div class="kicker">
+      Interactive strategic explainer
+    </div>
+
+    <h1>
+      The Spykman Trap
+    </h1>
+
+    <p class="dek">
+      When strategic centrality becomes an obligation that is harder to escape than to acquire.
+    </p>
+
+  </div>
+
+</header>
+
+
+<main>
+
+<div class="wrap">
+
+<div class="panel">
+
+
+<!-- =====================================================
+     THEORY FORMULA
+===================================================== -->
+
+<div class="formula">
+
+  <div class="label">
+    The theory's heuristic
+  </div>
+
+  <div class="eq">
+    <em>T</em> rises as <em>C</em> + <em>K</em> + <em>G</em> rise while <em>S</em> falls
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN GRAPH
+===================================================== -->
+
+<div class="plot">
+
+<svg
+  id="plot"
+  viewBox="0 0 900 430"
+  aria-label="Spykman Trap horizontal strategic pressure field"
+>
+
+
+<defs>
+
+
+<!--
+==========================================================
+MAIN HORIZONTAL TRAP GRADIENT
+
+The field becomes darker from left to right.
+
+There is NO radial gradient.
+There is NO circle.
+There is NO ellipse.
+
+The final stop covers the entire right edge
+with the same dark red value.
+==========================================================
+-->
+
+<linearGradient
+  id="trapGradient"
+  x1="0%"
+  y1="0%"
+  x2="100%"
+  y2="0%"
+>
+
+  <stop
+    offset="0%"
+    stop-color="#ad1f24"
+    stop-opacity="0.025"
+  />
+
+  <stop
+    offset="20%"
+    stop-color="#ad1f24"
+    stop-opacity="0.045"
+  />
+
+  <stop
+    offset="40%"
+    stop-color="#ad1f24"
+    stop-opacity="0.08"
+  />
+
+  <stop
+    offset="55%"
+    stop-color="#ad1f24"
+    stop-opacity="0.16"
+  />
+
+  <stop
+    offset="68%"
+    stop-color="#ad1f24"
+    stop-opacity="0.28"
+  />
+
+  <stop
+    offset="80%"
+    stop-color="#ad1f24"
+    stop-opacity="0.43"
+  />
+
+  <stop
+    offset="90%"
+    stop-color="#94191e"
+    stop-opacity="0.62"
+  />
+
+  <stop
+    offset="100%"
+    stop-color="#741015"
+    stop-opacity="0.88"
+  />
+
+</linearGradient>
+
+
+<!--
+==========================================================
+VERTICAL FADE
+
+This keeps the red strongest through the centre
+of the field without creating a circular shape.
+
+It is deliberately subtle.
+==========================================================
+-->
+
+<linearGradient
+  id="verticalFade"
+  x1="0%"
+  y1="0%"
+  x2="0%"
+  y2="100%"
+>
+
+  <stop
+    offset="0%"
+    stop-color="#ffffff"
+    stop-opacity="0.70"
+  />
+
+  <stop
+    offset="20%"
+    stop-color="#ffffff"
+    stop-opacity="0.12"
+  />
+
+  <stop
+    offset="50%"
+    stop-color="#ffffff"
+    stop-opacity="0"
+  />
+
+  <stop
+    offset="80%"
+    stop-color="#ffffff"
+    stop-opacity="0.12"
+  />
+
+  <stop
+    offset="100%"
+    stop-color="#ffffff"
+    stop-opacity="0.70"
+  />
+
+</linearGradient>
+
+
+<!--
+==========================================================
+SYSTEM MARKER SHADOW
+==========================================================
+-->
+
+<filter
+  id="shadow"
+  x="-100%"
+  y="-100%"
+  width="300%"
+  height="300%"
+>
+
+  <feDropShadow
+    dx="0"
+    dy="2"
+    stdDeviation="4"
+    flood-opacity=".20"
+  />
+
+</filter>
+
+
+</defs>
+
+
+<!-- =====================================================
+     GRAPH TITLE
+===================================================== -->
+
+<text
+  x="450"
+  y="30"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="11"
+  font-weight="700"
+  letter-spacing=".05em"
+  fill="#514d47"
+>
+  INCREASING POTENTIAL FOR STRATEGIC ENTRAPMENT
+</text>
+
+
+<!-- =====================================================
+     TRAP FIELD
+===================================================== -->
+
+<rect
+  x="80"
+  y="82"
+  width="740"
+  height="210"
+  fill="url(#trapGradient)"
+/>
+
+
+<!--
+A subtle vertical fade is placed over the horizontal
+gradient. It does NOT create a radial hotspot.
+-->
+
+<rect
+  x="80"
+  y="82"
+  width="740"
+  height="210"
+  fill="url(#verticalFade)"
+/>
+
+
+<!-- =====================================================
+     TRAP ZONE THRESHOLD
+===================================================== -->
+
+<line
+  x1="510"
+  y1="72"
+  x2="510"
+  y2="302"
+  stroke="#ad1f24"
+  stroke-width="2"
+  opacity=".75"
+/>
+
+
+<!--
+Only this text is placed inside the Trap Zone.
+No explanatory text is placed inside it.
+-->
+
+<text
+  x="525"
+  y="105"
+  font-family="Georgia,serif"
+  font-size="25"
+  font-weight="700"
+  fill="#8d171c"
+>
+  TRAP ZONE
+</text>
+
+
+<!-- =====================================================
+     FIELD BOUNDARIES
+===================================================== -->
+
+<line
+  x1="80"
+  y1="82"
+  x2="820"
+  y2="82"
+  stroke="#d8d2c8"
+  stroke-width="1"
+/>
+
+<line
+  x1="80"
+  y1="292"
+  x2="820"
+  y2="292"
+  stroke="#bcb6ad"
+  stroke-width="1"
+/>
+
+
+<!-- =====================================================
+     X AXIS
+===================================================== -->
+
+<line
+  x1="80"
+  y1="330"
+  x2="820"
+  y2="330"
+  stroke="#181716"
+  stroke-width="1.5"
+/>
+
+
+<!-- Left tick -->
+
+<line
+  x1="80"
+  y1="324"
+  x2="80"
+  y2="336"
+  stroke="#181716"
+  stroke-width="1"
+/>
+
+
+<!-- Trap threshold tick -->
+
+<line
+  x1="510"
+  y1="324"
+  x2="510"
+  y2="336"
+  stroke="#ad1f24"
+  stroke-width="2"
+/>
+
+
+<!-- Maximum tick -->
+
+<line
+  x1="820"
+  y1="324"
+  x2="820"
+  y2="336"
+  stroke="#741015"
+  stroke-width="2"
+/>
+
+
+<!-- =====================================================
+     AXIS LABELS
+===================================================== -->
+
+<text
+  x="80"
+  y="355"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="10"
+  font-weight="700"
+  fill="#514d47"
+>
+  CONTAINED
+</text>
+
+
+<text
+  x="510"
+  y="355"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="10"
+  font-weight="700"
+  fill="#8d171c"
+>
+  FORMING
+</text>
+
+
+<text
+  x="820"
+  y="355"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="10"
+  font-weight="700"
+  fill="#741015"
+>
+  HIGH
+</text>
+
+
+<text
+  x="820"
+  y="392"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="9"
+  font-weight="700"
+  fill="#741015"
+  letter-spacing=".04em"
+>
+  MAXIMUM TRAP POTENTIAL
+</text>
+
+
+<!-- =====================================================
+     SYSTEM TESTED MARKER
+
+     The marker itself is the only moving element.
+
+     It can now travel from x=80 to x=820.
+===================================================== -->
+
+<circle
+  id="halo"
+  cx="80"
+  cy="187"
+  r="17"
+  fill="#ad1f24"
+  opacity=".10"
+/>
+
+
+<circle
+  id="dot"
+  cx="80"
+  cy="187"
+  r="8"
+  fill="#181716"
+  stroke="#fffdf8"
+  stroke-width="4"
+  filter="url(#shadow)"
+/>
+
+
+<text
+  id="dotLabel"
+  x="120"
+  y="153"
+  text-anchor="middle"
+  font-family="Arial,sans-serif"
+  font-size="11"
+  font-weight="700"
+  fill="#181716"
+>
+  SYSTEM TESTED
+</text>
+
+
+</svg>
+
+</div>
+
+
+<!-- =====================================================
+     LEGEND
+===================================================== -->
+
+<div class="legend">
+
+  <span>
+    <i class="swatch red"></i>
+    Trap potential
+  </span>
+
+  <span>
+    <i class="swatch black"></i>
+    System Tested
+  </span>
+
+</div>
+
+
+<!-- =====================================================
+     CONTROLS
+===================================================== -->
+
+<div
+  class="controls"
+  id="controls"
+></div>
+
+
+<!-- =====================================================
+     STATUS
+===================================================== -->
+
+<div class="status">
+
+  <strong id="statusTitle">
+    TRAP CONDITIONS: CONTAINED
+  </strong>
+
+  <p id="statusText">
+    The configuration remains buffered. At least one of the formula's key conditions is still limiting the potential for strategic entrapment.
+  </p>
+
+</div>
+
+
+<!-- =====================================================
+     EXPLANATORY NOTE
+===================================================== -->
+
+<div class="note">
+
+  <b>How to read the plot:</b>
+  the Trap field increases from left to right.
+  The system moves across the field as
+  <b>C</b> (strategic centrality),
+  <b>K</b> (critical-function concentration) and
+  <b>G</b> (concentration of strategic stewardship) rise,
+  while <b>S</b> (real substitutability) falls.
+  The marker grows as qualitative Trap potential rises.
+  The graphic is a conceptual heuristic, not a quantitative index.
+
+</div>
+
+
+</div>
+
+</div>
+
+</main>
+
+
+<script>
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+const state = {
+  C:"mid",
+  K:"mid",
+  G:"mid",
+  S:"mid"
+};
+
+
+/* =====================================================
+   LEVELS
+===================================================== */
+
+const levels = {
+  low:0,
+  mid:1,
+  high:2
+};
+
+
+/* =====================================================
+   VARIABLE DEFINITIONS
+===================================================== */
+
+const defs = {
+
+  C:[
+    "C — Strategic centrality",
+    "Where the node sits in the network and how much strategic gravity it acquires.",
+    ["Limited","High","Indispensable"],
+    ["low","mid","high"]
+  ],
+
+  K:[
+    "K — Critical-function concentration",
+    "How many critical functions are concentrated at the node.",
+    ["Low","Mixed","High"],
+    ["low","mid","high"]
+  ],
+
+  G:[
+    "G — Strategic stewardship concentration",
+    "How strongly responsibility for protecting the system is concentrated in one actor.",
+    ["Distributed","Uneven","Concentrated"],
+    ["low","mid","high"]
+  ],
+
+  S:[
+    "S — Real substitutability",
+    "How easily critical functions can actually be moved elsewhere in a crisis.",
+    ["High","Limited","Minimal"],
+    ["high","mid","low"]
+  ]
+
+};
+
+
+/* =====================================================
+   BUILD CONTROLS
+===================================================== */
+
+const controls =
+  document.getElementById("controls");
+
+
+Object.keys(defs).forEach(key => {
+
+  const [
+    title,
+    desc,
+    labels,
+    vals
+  ] = defs[key];
+
+
+  const row =
+    document.createElement("div");
+
+  row.className = "control";
+
+
+  const name =
+    document.createElement("div");
+
+  name.className = "control-name";
+
+  name.innerHTML =
+    "<b>" + title + "</b>" +
+    "<small>" + desc + "</small>";
+
+
+  const choices =
+    document.createElement("div");
+
+  choices.className = "choices";
+
+  choices.dataset.key = key;
+
+
+  labels.forEach((label,i) => {
+
+    const button =
+      document.createElement("button");
+
+    button.type = "button";
+
+    button.textContent = label;
+
+    button.dataset.v = vals[i];
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        state[key] =
+          button.dataset.v;
+
+        update();
+
+      }
+    );
+
+
+    choices.appendChild(button);
+
+  });
+
+
+  row.append(
+    name,
+    choices
+  );
+
+
+  controls.appendChild(row);
+
+});
+
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+function update(){
+
+
+  /* -----------------------------------------------
+     Update active controls
+  ------------------------------------------------ */
+
+  document
+    .querySelectorAll(".choices")
+    .forEach(group => {
+
+      group
+        .querySelectorAll("button")
+        .forEach(button => {
+
+          button.classList.toggle(
+            "active",
+            button.dataset.v ===
+            state[group.dataset.key]
+          );
+
+        });
+
+    });
+
+
+  /* -----------------------------------------------
+     Read variables
+  ------------------------------------------------ */
+
+  const C =
+    levels[state.C];
+
+  const K =
+    levels[state.K];
+
+  const G =
+    levels[state.G];
+
+  const S =
+    levels[state.S];
+
+
+  /* -----------------------------------------------
+     Trap pressure
+
+     C, K and G increase pressure.
+
+     Lower S increases pressure.
+
+     Range = 0 to 2.
+  ------------------------------------------------ */
+
+  const pressure =
+    (
+      C +
+      K +
+      G +
+      (2 - S)
+    ) / 4;
+
+
+  /* -----------------------------------------------
+     Full horizontal travel
+
+     0 pressure  = x 80
+     1 pressure  = x 450
+     2 pressure  = x 820
+
+     Unlike the previous version, there is no
+     artificial stopping point at x=450.
+  ------------------------------------------------ */
+
+  const xMin = 80;
+  const xMax = 820;
+
+  const x =
+    xMin +
+    (
+      (xMax - xMin) *
+      (pressure / 2)
+    );
+
+
+  /* -----------------------------------------------
+     Fixed vertical position
+  ------------------------------------------------ */
+
+  const y = 187;
+
+
+  /* -----------------------------------------------
+     Marker size
+  ------------------------------------------------ */
+
+  const radius =
+    8 +
+    pressure * 6;
+
+
+  /* -----------------------------------------------
+     Marker halo
+
+     This is deliberately small and remains attached
+     to the System Tested marker.
+
+     It is NOT the maximum Trap indicator.
+  ------------------------------------------------ */
+
+  const haloRadius =
+    17 +
+    pressure * 7;
+
+
+  /* -----------------------------------------------
+     Elements
+  ------------------------------------------------ */
+
+  const dot =
+    document.getElementById("dot");
+
+  const halo =
+    document.getElementById("halo");
+
+  const label =
+    document.getElementById("dotLabel");
+
+
+  /* -----------------------------------------------
+     Move marker
+  ------------------------------------------------ */
+
+  dot.setAttribute(
+    "cx",
+    x
+  );
+
+  dot.setAttribute(
+    "cy",
+    y
+  );
+
+  dot.setAttribute(
+    "r",
+    radius
+  );
+
+
+  halo.setAttribute(
+    "cx",
+    x
+  );
+
+  halo.setAttribute(
+    "cy",
+    y
+  );
+
+  halo.setAttribute(
+    "r",
+    haloRadius
+  );
+
+
+  /* -----------------------------------------------
+     Keep marker label inside SVG
+  ------------------------------------------------ */
+
+  let labelX = x;
+
+
+  if(labelX < 120){
+    labelX = 120;
+  }
+
+
+  if(labelX > 780){
+    labelX = 780;
+  }
+
+
+  label.setAttribute(
+    "x",
+    labelX
+  );
+
+
+  label.setAttribute(
+    "y",
+    y - radius - 18
+  );
+
+
+  /* =================================================
+     STATUS
+  ================================================= */
+
+  const full =
+    C === 2 &&
+    K === 2 &&
+    G === 2 &&
+    S === 0;
+
+
+  const forming =
+    pressure >= 1.1;
+
+
+  if(full){
+
+    document
+      .getElementById("statusTitle")
+      .textContent =
+      "TRAP CONDITIONS: HIGH";
+
+
+    document
+      .getElementById("statusText")
+      .textContent =
+      "The four formula variables converge: strategic centrality, critical-function concentration and concentrated strategic stewardship are high, while real substitutability is minimal.";
+
+  }
+
+  else if(forming){
+
+    document
+      .getElementById("statusTitle")
+      .textContent =
+      "TRAP CONDITIONS: FORMING";
+
+
+    document
+      .getElementById("statusText")
+      .textContent =
+      "Several conditions are converging. Centrality is becoming more consequential as critical functions and protection responsibility concentrate while alternatives weaken.";
+
+  }
+
+  else{
+
+    document
+      .getElementById("statusTitle")
+      .textContent =
+      "TRAP CONDITIONS: CONTAINED";
+
+
+    document
+      .getElementById("statusText")
+      .textContent =
+      "The configuration remains buffered. At least one of the formula's key conditions is still limiting the potential for strategic entrapment.";
+
+  }
+
+}
+
+
+/* =====================================================
+   INITIALISE
+===================================================== */
+
+update();
+
+</script>
+
+</body>
+</html>
