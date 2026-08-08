@@ -1288,5 +1288,22 @@ update();
 
 </script>
 
+
+    <script>
+    // --- AUTO-RESIZE FOR BLOGGER IFRAME ---
+    function sendHeight() {
+      // Get the actual height of the dashboard
+      const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+      // Send it to the parent Blogger window
+      window.parent.postMessage({ type: 'spykman-trap-height', height: height }, '*');
+    }
+    
+    // Send the height when the page loads, and anytime the content changes size
+    window.addEventListener('load', sendHeight);
+    const observer = new ResizeObserver(sendHeight);
+    observer.observe(document.body);
+  </script>
+  
+</body>
 </body>
 </html>
